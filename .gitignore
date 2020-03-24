@@ -1,0 +1,5 @@
+.DS_Store
+*.rar 
+*.txt 
+.jar 
+__pycache__
