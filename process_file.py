@@ -60,7 +60,7 @@ def build_output_stirng(data_row):
     d qid:0000 1:feat_val .... 
     note here we are removing the # id= and inc= and prob= those are not used by the classifier 
     """
-    output = f"{data_row[0]} qid:{data_row[1]}"
+    output = f"{data_row[0]} qid:{int(data_row[1])}"
     for i in range(2,len(data_row)):
         output +=f" {i}:{data_row[i]}"
     return output 
@@ -91,8 +91,8 @@ def writeFold(output_dir,dataList):
     os.chdir(output_dir)
     concatData = pd.concat(dataList[0:3],axis=0)
     write_data(concatData,'train.txt')
-    write_data(dataList[3],'test.txt')
-    write_data(dataList[4],'vali.txt')
+    write_data(dataList[3],'vali.txt')
+    write_data(dataList[4],'test.txt')
 
 if __name__ == "__main__": 
     #load it in main instead of funciton because it's expensive to load 
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     output_dir = "./augData/"
     main_path = os.getcwd()
     os.chdir(data_dir)
-    dataFiles= glob('S*') #here we get the files meant to be for training testing 
+    dataFiles= sorted(glob('S*')) #here we get the files meant to be for training testing 
     dataList = list() 
     for e in dataFiles:
         data= expand_data(e,idmap)
@@ -115,5 +115,5 @@ if __name__ == "__main__":
     os.chdir(output_dir)
     for i,e in enumerate(folds):
         permutation = [dataList[idx] for idx in e]
-        writeFold(f'Fold_{i}',permutation)
+        writeFold(f'Fold_{i+1}',permutation)
         os.chdir('../')

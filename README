@@ -1,0 +1,12 @@
+project layout 
+/HW2/MQ2007 
+  - should contain all unzipped files. Should add featureNames.txt 
+/HW2/MQ2008 
+    - same as above 
+/HW2 
+  - Has thee MQ oflders 
+  - all the .py and sh files  
+  - the RankLib.jar 
+  - Eval-Score-4.0 pl 
+  - should also have RefTable.txt and sitemap.txt 
+  
