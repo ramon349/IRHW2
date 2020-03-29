@@ -3,6 +3,7 @@ from getSiteFeats import load_site_feats
 from glob import glob
 from shutil import rmtree
 import os
+from get_simi import add_simi 
 
 
 def getFeatureNames():
@@ -28,8 +29,6 @@ def load_site2id_map():
             oid, nid = l.rstrip('\n').split('\t')
             idmap[nid] = int(oid)
     return idmap
-
-
 def load_data(dataPath):
     """ This is meant to load the S1-S5.txt files 
     Basically loads the data as a pandas data frame using some preprocessing 
@@ -39,7 +38,7 @@ def load_data(dataPath):
     # This range corresponds with the useful features
     data: pd.DataFrame = pd.read_csv(dataPath, names=featNames, sep=" ", usecols=range(0, 48))
     # this range corresponds with the ID column
-    docIDS = pd.read_csv(dataPath, names=['docid'], sep=" ", usecols=range(50, 51))
+    docIDS = pd.read_csv(dataPath, names=['did'], sep=" ", usecols=range(50, 51))
     inc = pd.read_csv(dataPath, names=['inc'], sep=" ", usecols=range(53, 54)) 
     prob = pd.read_csv(dataPath, names=['prob'], sep=" ", usecols=range(56, 57)) 
     # go through each column and make it actually numeric.  this is done by a series of consistent concats
@@ -83,11 +82,11 @@ def build_output_stirng(data_row):
        'lmir.jmofanchor', 'lmir.jmoftitle', 'lmir.jmofurl',
        'lmir.jmofwholedocument', 'pagerank', 'inlinknumber', 'outlinknumber',
        'numberofslashinurl', 'lengthofurl', 'numberofchildpage',
-       'multtfbodydlbody', 'linkinter','combi','powPageRank'] 
+       'multtfbodydlbody', 'linkinter','combi','powPageRank','simi','atenpagerank'] 
     others = ['docid','inc','prop']
     for i,name in enumerate(features):
         output += f" {i+1}:{data_row[name]}"
-    output += f" #dodcid = {data_row['docid']} inc = {int(data_row['inc'])} prob = {data_row['prob']}"
+    output += f" #dodcid = {data_row['did']} inc = {int(data_row['inc'])} prob = {data_row['prob']}"
     return output
 
 
@@ -105,7 +104,7 @@ def expand_data(filePath, idmap):
     example = filePath  # "./MQ2007/S1.txt"
     data, docID = load_data(example)
     newID = list()
-    for e in docID['docid']:
+    for e in docID['did']:
         newID.append(idmap[e])
     
     #indexFrame = pd.DataFrame.from_dict({'id': newID})
@@ -115,6 +114,8 @@ def expand_data(filePath, idmap):
     data['linkinter'] = data['inlinknumber'] * data['outlinknumber']
     data['combi'] = data['tfdocument']*data['idfdocument']
     data['powPageRank'] = data['pagerank']*data['pagerank']
+    data = add_simi(data)
+    data['atenpagerank']=data['pagerank']*data['simi']
 
     return data
 

@@ -1,5 +1,5 @@
-queryId 
-pageIndex
+rel
+qid
 TFBody
 TFAnchor
 TFTitle 
