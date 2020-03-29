@@ -42,12 +42,13 @@ def load_data(dataPath):
     docIDS = pd.read_csv(dataPath, names=['did'], sep=" ", usecols=range(50, 51))
     inc = pd.read_csv(dataPath, names=['inc'], sep=" ", usecols=range(53, 54)) 
     prob = pd.read_csv(dataPath, names=['prob'], sep=" ", usecols=range(56, 57)) 
+
     # go through each column and make it actually numeric.  this is done by a series of consistent concats
     # i could change this to be a simple reasignment?
     for col_name in data.keys():
         # numeric_data = pd.concat((numeric_data,make_numeric(data[col_name],col_name) ),axis=1)
         data[col_name] = make_numeric(data[col_name], col_name)
-    data= pd.concat((data,inc,prob,docIDS),axis=1)
+    data = pd.concat((data, inc, prob, docIDS), axis=1)
     return (data, docIDS)
 
 
@@ -71,23 +72,24 @@ def build_output_stirng(data_row):
     note here we are removing the # id= and inc= and prob= those are not used by the classifier 
     """
     output = f"{data_row[0]} qid:{int(data_row[1])}"
-    features = [ 'tfbody', 'tfanchor', 'tftitle', 'tfurl',
-       'tfdocument', 'idfbody', 'idfanchor', 'idftitle', 'idfurl',
-       'idfdocument', 'tf*idfbody', 'tf*idfanchor', 'tf*idftitle', 'tf*idfurl',
-       'tf*idfwholedocument', 'dlbody', 'dlanchor', 'dltitle', 'dlurl',
-       'dlwholedocument', 'bm25body', 'bm25anchor', 'bm25title', 'bme25url',
-       'bm25wholedocument', 'lmir.absofbody', 'lmir.absofanchor',
-       'lmir.absoftitle', 'lmir.absofurl', 'lmir.absofwholedocument',
-       'lmir.dirofbody', 'lmir.dirofanchor', 'lmir.diroftitle',
-       'lmir.dirofurl', 'lmir.dirofwholedocument', 'lmir.jmofbody',
-       'lmir.jmofanchor', 'lmir.jmoftitle', 'lmir.jmofurl',
-       'lmir.jmofwholedocument', 'pagerank', 'inlinknumber', 'outlinknumber',
-       'numberofslashinurl', 'lengthofurl', 'numberofchildpage',
-       'multtfbodydlbody', 'linkinter','combi','powPageRank','simi','atenpagerank'] 
-    others = ['docid','inc','prop']
-    for i,name in enumerate(features):
-        output += f" {i+1}:{data_row[name]}"
-    output += f" #dodcid = {data_row['did']} inc = {int(data_row['inc'])} prob = {data_row['prob']}"
+    features = ['tfbody', 'tfanchor', 'tftitle', 'tfurl',
+                'tfdocument', 'idfbody', 'idfanchor', 'idftitle', 'idfurl',
+                'idfdocument', 'tf*idfbody', 'tf*idfanchor', 'tf*idftitle', 'tf*idfurl',
+                'tf*idfwholedocument', 'dlbody', 'dlanchor', 'dltitle', 'dlurl',
+                'dlwholedocument', 'bm25body', 'bm25anchor', 'bm25title', 'bme25url',
+                'bm25wholedocument', 'lmir.absofbody', 'lmir.absofanchor',
+                'lmir.absoftitle', 'lmir.absofurl', 'lmir.absofwholedocument',
+                'lmir.dirofbody', 'lmir.dirofanchor', 'lmir.diroftitle',
+                'lmir.dirofurl', 'lmir.dirofwholedocument', 'lmir.jmofbody',
+                'lmir.jmofanchor', 'lmir.jmoftitle', 'lmir.jmofurl',
+                'lmir.jmofwholedocument', 'pagerank', 'inlinknumber', 'outlinknumber',
+                'numberofslashinurl', 'lengthofurl', 'numberofchildpage',
+                'multtfbodydlbody', 'linkinter', 'combi', 'powPageRank', 'meanTF', 'meanIDF', 'meanDL']
+    others = ['docid', 'inc', 'prop']
+    for i, name in enumerate(features):
+        output += f" {i + 1}:{data_row[name]}"
+    output += f" #dodcid = {data_row['docid']} inc = {int(data_row['inc'])} prob = {data_row['prob']}"
+
     return output
 
 
@@ -107,17 +109,18 @@ def expand_data(filePath, idmap):
     newID = list()
     for e in docID['did']:
         newID.append(idmap[e])
-    
-    #indexFrame = pd.DataFrame.from_dict({'id': newID})
-    #data = pd.concat((data, indexFrame), axis=1)
-    #data.set_index('id')
-    data['multtfbodydlbody' ] = data['tfbody']*data['dlbody'] 
+    # indexFrame = pd.DataFrame.from_dict({'id': newID})
+    # data = pd.concat((data, indexFrame), axis=1)
+    # data.set_index('id')
+    data['multtfbodydlbody'] = data['tfbody'] * data['dlbody']
     data['linkinter'] = data['inlinknumber'] * data['outlinknumber']
-    data['combi'] = data['tfdocument']*data['idfdocument']
-    data['powPageRank'] = data['pagerank']*data['pagerank']
-    data = add_simi(data)
-    data['atenpagerank']=data['pagerank']*data['simi']
-
+    data['combi'] = data['tfdocument'] * data['idfdocument']
+    data['powPageRank'] = data['pagerank'] * data['pagerank']
+    data['meanTF'] = (data['tfbody'] + data['tfanchor'] + data['tftitle'] + data['tfurl'] + data['tfdocument']) / 5
+    data['meanIDF'] = (data['idfbody'] + data['idfanchor'] + data['idftitle'] +
+                       data['idfurl'] + data['idfdocument']) / 5
+    data['meanDL'] = (data['dlbody'] + data['dlanchor'] + data['dltitle'] + data['dlurl'] + data['dlwholedocument']) / 5
+    
     return data
 
 
