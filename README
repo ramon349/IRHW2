@@ -9,4 +9,18 @@ project layout
   - the RankLib.jar 
   - Eval-Score-4.0 pl 
   - should also have RefTable.txt and sitemap.txt 
-  
+
+
+todo for similarity features: 
+1. Download the MQ2008-semi and MQ2007-semi data
+2. Extract only the Large_NULL.TXT files.
+  2.a in hw folder make a folder called utils 
+  2.a rename the large_null files to MQ2008_large_null.txt and MQ2007_large_null.txt and put then in utils
+3. download the 2007 and 2008 simi files. alos move them to the utils folder 
+  3.a name the files 2007_large_simi respectively 
+3. run bash ./processing_scripts/getQuery2Doc.sh 
+  3a. This generates  MQ2008_list and MQ2007_list.txt  which is the rankigns of documents and query pairs 
+  3b. This is needed by get_simi.py to calculate the actual features 
+  3c. This script will also extract the necessary similarity features by calling get_simi.py 
+4. run bash ./processing_scripts/generate_dataset.sh 
+ 4.a this will generate the augmented datasets now called 2007_augData and 2008_augData

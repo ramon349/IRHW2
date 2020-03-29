@@ -1,15 +1,17 @@
 import pandas as pd
+import sys 
+import os
 from getSiteFeats import load_site_feats
 from glob import glob
 from shutil import rmtree
-import os
+from get_simi import add_simi 
 
 
 def getFeatureNames():
     """  This is an arbitrary file i made containing "names" names for the original features
     """
     feat_names = list()
-    with open('../featureNames.txt', 'r') as f:
+    with open('../utils/featureNames.txt', 'r') as f:
         for e in f:
             feat_names.append(e.rstrip('\n').lower().rstrip(' '))
     return feat_names
@@ -22,14 +24,12 @@ def load_site2id_map():
         TODO MAKE SURE THIS WORKS WITH THE 2008 VERSION
     """
     idmap = dict()
-    with open('./RefTable.txt', 'r') as f:
+    with open('./utils/RefTable.txt', 'r') as f:
         for l in f:
             # print(f"The value is {l}")
             oid, nid = l.rstrip('\n').split('\t')
             idmap[nid] = int(oid)
     return idmap
-
-
 def load_data(dataPath):
     """ This is meant to load the S1-S5.txt files 
     Basically loads the data as a pandas data frame using some preprocessing 
@@ -39,9 +39,10 @@ def load_data(dataPath):
     # This range corresponds with the useful features
     data: pd.DataFrame = pd.read_csv(dataPath, names=featNames, sep=" ", usecols=range(0, 48))
     # this range corresponds with the ID column
-    docIDS = pd.read_csv(dataPath, names=['docid'], sep=" ", usecols=range(50, 51))
-    inc = pd.read_csv(dataPath, names=['inc'], sep=" ", usecols=range(53, 54))
-    prob = pd.read_csv(dataPath, names=['prob'], sep=" ", usecols=range(56, 57))
+    docIDS = pd.read_csv(dataPath, names=['did'], sep=" ", usecols=range(50, 51))
+    inc = pd.read_csv(dataPath, names=['inc'], sep=" ", usecols=range(53, 54)) 
+    prob = pd.read_csv(dataPath, names=['prob'], sep=" ", usecols=range(56, 57)) 
+
     # go through each column and make it actually numeric.  this is done by a series of consistent concats
     # i could change this to be a simple reasignment?
     for col_name in data.keys():
@@ -88,6 +89,7 @@ def build_output_stirng(data_row):
     for i, name in enumerate(features):
         output += f" {i + 1}:{data_row[name]}"
     output += f" #dodcid = {data_row['docid']} inc = {int(data_row['inc'])} prob = {data_row['prob']}"
+
     return output
 
 
@@ -105,9 +107,8 @@ def expand_data(filePath, idmap):
     example = filePath  # "./MQ2007/S1.txt"
     data, docID = load_data(example)
     newID = list()
-    for e in docID['docid']:
+    for e in docID['did']:
         newID.append(idmap[e])
-
     # indexFrame = pd.DataFrame.from_dict({'id': newID})
     # data = pd.concat((data, indexFrame), axis=1)
     # data.set_index('id')
@@ -135,17 +136,22 @@ def writeFold(output_dir, dataList):
 
 if __name__ == "__main__":
     # load it in main instead of funciton because it's expensive to load
+    print("Loading reference table")
     idmap = load_site2id_map()
-    data_dir = './MQ2008/'  # this is the data directory
+    print("Done ")
+    data_dir = sys.argv[1] #'./MQ2008/'  # this is the data directory
     # directory where data will be saved
-    output_dir = "./augData1/"
+    output_dir = sys.argv[2]#"./2008_augData1/"
+    print(f"Will extract features for {data_dir} and save to {output_dir}")
     main_path = os.getcwd()
     os.chdir(data_dir)
     dataFiles = sorted(glob('S*'))  # here we get the files meant to be for training testing
     dataList = list()
     for e in dataFiles:
+        print(f"Loading and expanding {e}")
         data = expand_data(e, idmap)
         dataList.append(data)
+        print(f"Done expanding {e}")
     os.chdir(main_path)
     folds = [[0, 1, 2, 3, 4], [1, 2, 3, 4, 0], [2, 3, 4, 0, 1], [3, 4, 0, 1, 2], [4, 0, 1, 2, 3]]
     if os.path.isdir(output_dir):
@@ -153,6 +159,7 @@ if __name__ == "__main__":
     os.mkdir(output_dir)
     os.chdir(output_dir)
     for i, e in enumerate(folds):
+        print(f"Saving fold {i}")
         permutation = [dataList[idx] for idx in e]
         writeFold(f'Fold_{i + 1}', permutation)
         os.chdir('../')
