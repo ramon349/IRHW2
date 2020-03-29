@@ -1,5 +1,11 @@
 .DS_Store
 *.rar 
-*.txt 
-.jar 
+*.jar 
 __pycache__
+MQ2007/
+MQ2008/
+RefTable.txt
+MQ2007*
+MQ2008*
+2007*
+2008*
