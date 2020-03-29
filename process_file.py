@@ -1,8 +1,9 @@
 import pandas as pd
+import sys 
+import os
 from getSiteFeats import load_site_feats
 from glob import glob
 from shutil import rmtree
-import os
 from get_simi import add_simi 
 
 
@@ -10,7 +11,7 @@ def getFeatureNames():
     """  This is an arbitrary file i made containing "names" names for the original features
     """
     feat_names = list()
-    with open('../featureNames.txt', 'r') as f:
+    with open('../utils/featureNames.txt', 'r') as f:
         for e in f:
             feat_names.append(e.rstrip('\n').lower().rstrip(' '))
     return feat_names
@@ -23,7 +24,7 @@ def load_site2id_map():
         TODO MAKE SURE THIS WORKS WITH THE 2008 VERSION
     """
     idmap = dict()
-    with open('./RefTable.txt', 'r') as f:
+    with open('./utils/RefTable.txt', 'r') as f:
         for l in f:
             # print(f"The value is {l}")
             oid, nid = l.rstrip('\n').split('\t')
@@ -132,17 +133,22 @@ def writeFold(output_dir, dataList):
 
 if __name__ == "__main__":
     # load it in main instead of funciton because it's expensive to load
+    print("Loading reference table")
     idmap = load_site2id_map()
-    data_dir = './MQ2008/'  # this is the data directory
+    print("Done ")
+    data_dir = sys.argv[1] #'./MQ2008/'  # this is the data directory
     # directory where data will be saved
-    output_dir = "./augData1/"
+    output_dir = sys.argv[2]#"./2008_augData1/"
+    print(f"Will extract features for {data_dir} and save to {output_dir}")
     main_path = os.getcwd()
     os.chdir(data_dir)
     dataFiles = sorted(glob('S*'))  # here we get the files meant to be for training testing
     dataList = list()
     for e in dataFiles:
+        print(f"Loading and expanding {e}")
         data = expand_data(e, idmap)
         dataList.append(data)
+        print(f"Done expanding {e}")
     os.chdir(main_path)
     folds = [[0, 1, 2, 3, 4], [1, 2, 3, 4, 0], [2, 3, 4, 0, 1], [3, 4, 0, 1, 2], [4, 0, 1, 2, 3]]
     if os.path.isdir(output_dir):
@@ -150,6 +156,7 @@ if __name__ == "__main__":
     os.mkdir(output_dir)
     os.chdir(output_dir)
     for i, e in enumerate(folds):
+        print(f"Saving fold {i}")
         permutation = [dataList[idx] for idx in e]
         writeFold(f'Fold_{i + 1}', permutation)
         os.chdir('../')
