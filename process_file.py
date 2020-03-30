@@ -101,16 +101,13 @@ def write_data(data: pd.DataFrame, fname):
             f.write('\n')
 
 
-def expand_data(filePath, idmap,simi_feats=None,simi_map=None):
+def expand_data(filePath,simi_feats,simi_map):
     example = filePath  # "./MQ2007/S1.txt"
     data, docID = load_data(example)
-    newID = list()
-    for e in docID['did']:
-        newID.append(idmap[e])
     # indexFrame = pd.DataFrame.from_dict({'id': newID})
     # data = pd.concat((data, indexFrame), axis=1)
     # data.set_index('id')
-    #data = add_simi(data,simi_feats,simi_map)#add similarity features 
+    data = add_simi(data,simi_feats,simi_map)#add similarity features 
     data['multtfbodydlbody'] = data['tfbody'] * data['dlbody']
     data['linkinter'] = data['inlinknumber'] * data['outlinknumber']
     data['combi'] = data['tfdocument'] * data['idfdocument']
@@ -135,7 +132,7 @@ def writeFold(output_dir, dataList):
 if __name__ == "__main__":
     # load it in main instead of funciton because it's expensive to load
     print("Loading reference table")
-    idmap = load_site2id_map()
+    #idmap = load_site2id_map()
     print("Done ")
     data_dir = sys.argv[1] #'./MQ2008/'  # this is the data directory
     # directory where data will be saved
@@ -145,11 +142,10 @@ if __name__ == "__main__":
     os.chdir(data_dir)
     dataFiles = sorted(glob('S*'))  # here we get the files meant to be for training testing
     dataList = list()
-#    (simi_feats,simi_map)= load_similarity_features()
-    simi_feats,simi_map = None,None 
+    (simi_feats,simi_map)= load_similarity_features()
     for e in dataFiles:
         print("Loading and expanding {}".format(e))
-        data = expand_data(e, idmap,simi_feats,simi_map)
+        data = expand_data(e,simi_feats,simi_map)
         dataList.append(data)
         print("Done expanding {}".format(e))
     os.chdir(main_path)

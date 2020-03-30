@@ -19,22 +19,17 @@ def parse_row(data_row):
 
 def add_simi(full_data,simi_feats,simi_map):
     data_list = list() 
-    for i,e in full_data.iterrows():
-        sample_qid  = int(e['qid'])
-        sample_did = e['did']
-        #here we identify the query's  that exist and get a number of them
-        query_matches = simi_map.loc[simi_map['qid']==sample_qid].reset_index()
-        #from all the documetns belong to that query i now search for the matching 
-        #document 
-        idx = query_matches.loc[query_matches['did']==sample_did].index[0]
-        #in the order of the queries with matchin qid this document is the idx element
-        try:  
-	    #i suspect the similarity features are incomplete... the ranking of documents
-            #is incomplete. for some quuerys simi_feats only has 170 qid instead of a 1000
-            feat=simi_feats.iloc[idx]['meanCol']
-        except IndexError: 
-            feat =0.0
-        data_list.append(feat)
+    uniqID=full_data['qid'].unique()
+    for ID in uniqID:
+        #get the datasets with the same query id 
+        data_subset=full_data.loc[full_data['qid']==ID].reset_index()
+        simi_map_subset=simi_map.loc[simi_map['qid']==ID].reset_index()
+        simi_feats_subset=simi_feats.loc[simi_feats['qid'] ==ID].reset_index()
+        for i,e in data_subset.iterrows():
+            sample_did=e['did']
+            idx = simi_map_subset.loc[simi_map_subset['did']==sample_did].index[0]
+            feat = simi_feats_subset['meanCol'][idx]
+            data_list.append(feat)
     myStuff = pd.DataFrame.from_dict({'simi':data_list})
     full_data = pd.concat((full_data,myStuff),axis=1)
     return full_data
