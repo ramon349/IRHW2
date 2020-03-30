@@ -4,8 +4,7 @@ import os
 from getSiteFeats import load_site_feats
 from glob import glob
 from shutil import rmtree
-from get_simi import add_simi 
-
+from get_simi import add_simi,load_similarity_features
 
 def getFeatureNames():
     """  This is an arbitrary file i made containing "names" names for the original features
@@ -88,7 +87,7 @@ def build_output_stirng(data_row):
     others = ['docid', 'inc', 'prop']
     for i, name in enumerate(features):
         output += f" {i + 1}:{data_row[name]}"
-    output += f" #dodcid = {data_row['docid']} inc = {int(data_row['inc'])} prob = {data_row['prob']}"
+    output += f" #dodcid = {data_row['did']} inc = {int(data_row['inc'])} prob = {data_row['prob']}"
 
     return output
 
@@ -103,7 +102,7 @@ def write_data(data: pd.DataFrame, fname):
             f.write('\n')
 
 
-def expand_data(filePath, idmap):
+def expand_data(filePath, idmap,simi_feats=None,simi_map=None):
     example = filePath  # "./MQ2007/S1.txt"
     data, docID = load_data(example)
     newID = list()
@@ -112,6 +111,7 @@ def expand_data(filePath, idmap):
     # indexFrame = pd.DataFrame.from_dict({'id': newID})
     # data = pd.concat((data, indexFrame), axis=1)
     # data.set_index('id')
+    #data = add_simi(data,simi_feats,simi_map)#add similarity features 
     data['multtfbodydlbody'] = data['tfbody'] * data['dlbody']
     data['linkinter'] = data['inlinknumber'] * data['outlinknumber']
     data['combi'] = data['tfdocument'] * data['idfdocument']
@@ -120,7 +120,6 @@ def expand_data(filePath, idmap):
     data['meanIDF'] = (data['idfbody'] + data['idfanchor'] + data['idftitle'] +
                        data['idfurl'] + data['idfdocument']) / 5
     data['meanDL'] = (data['dlbody'] + data['dlanchor'] + data['dltitle'] + data['dlurl'] + data['dlwholedocument']) / 5
-    
     return data
 
 
@@ -147,9 +146,11 @@ if __name__ == "__main__":
     os.chdir(data_dir)
     dataFiles = sorted(glob('S*'))  # here we get the files meant to be for training testing
     dataList = list()
+    #(simi_feats,simi_map)= load_similarity_features()
+    (simi_feats,simi_map) = (None, None)
     for e in dataFiles:
         print(f"Loading and expanding {e}")
-        data = expand_data(e, idmap)
+        data = expand_data(e, idmap,simi_feats,simi_map)
         dataList.append(data)
         print(f"Done expanding {e}")
     os.chdir(main_path)

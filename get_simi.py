@@ -17,8 +17,7 @@ def parse_row(data_row):
     qdid = measurements[1].split(':')[-1]
     return (queryid,qdid,data_sum)
 
-def add_simi(full_data:pd.DataFrame):
-    (simi_feats,simi_map)= load_similarity_features()
+def add_simi(full_data:pd.DataFrame,simi_feats,simi_map):
     data_list = list() 
     for i,e in full_data.iterrows():
         sample_qid  = int(e['qid'])
