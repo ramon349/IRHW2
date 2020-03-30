@@ -38,5 +38,5 @@ if __name__ == "__main__":
             data_list.append(parse_row(e))
     with open(outputFile, 'w') as f: 
         for e in data_list:
-            f.write(f"{e[0]} {e[1]} {e[2]}")
+            f.write("{} {} {}".format(e[0],e[1],e[2]))
             f.write('\n')

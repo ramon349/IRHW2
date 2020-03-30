@@ -70,7 +70,7 @@ def build_output_stirng(data_row):
     d qid:0000 1:feat_val .... 
     note here we are removing the # id= and inc= and prob= those are not used by the classifier 
     """
-    output = f"{data_row[0]} qid:{int(data_row[1])}"
+    output = "{} qid:{}".format(data_row[0],int(data_row[1]))
     features = ['tfbody', 'tfanchor', 'tftitle', 'tfurl',
                 'tfdocument', 'idfbody', 'idfanchor', 'idftitle', 'idfurl',
                 'idfdocument', 'tf*idfbody', 'tf*idfanchor', 'tf*idftitle', 'tf*idfurl',
@@ -85,8 +85,8 @@ def build_output_stirng(data_row):
                 'numberofslashinurl', 'lengthofurl', 'numberofchildpage',
                 'multtfbodydlbody', 'linkinter', 'combi', 'powPageRank', 'meanTF', 'meanIDF', 'meanDL','simi']
     for i, name in enumerate(features):
-        output += f" {i + 1}:{data_row[name]}"
-    output += f" #dodcid = {data_row['did']} inc = {int(data_row['inc'])} prob = {data_row['prob']}"
+        output += " {}:{}".format(i+1,data_row[name])
+    output += f" #dodcid = {} inc = {} prob = {}".format(data_row['did'],int(data_row['inc']),data_row['prob'])
 
     return output
 
@@ -140,18 +140,17 @@ if __name__ == "__main__":
     data_dir = sys.argv[1] #'./MQ2008/'  # this is the data directory
     # directory where data will be saved
     output_dir = sys.argv[2]#"./2008_augData1/"
-    print(f"Will extract features for {data_dir} and save to {output_dir}")
+    print("Will extract features for {} and save to {}".format(data_dir,output_dir)
     main_path = os.getcwd()
     os.chdir(data_dir)
     dataFiles = sorted(glob('S*'))  # here we get the files meant to be for training testing
     dataList = list()
     (simi_feats,simi_map)= load_similarity_features()
-    #(simi_feats,simi_map) = (None, None)
     for e in dataFiles:
-        print(f"Loading and expanding {e}")
+        print("Loading and expanding {}".format(e)
         data = expand_data(e, idmap,simi_feats,simi_map)
         dataList.append(data)
-        print(f"Done expanding {e}")
+        print("Done expanding {}".format(e))
     os.chdir(main_path)
     folds = [[0, 1, 2, 3, 4], [1, 2, 3, 4, 0], [2, 3, 4, 0, 1], [3, 4, 0, 1, 2], [4, 0, 1, 2, 3]]
     if os.path.isdir(output_dir):
@@ -159,7 +158,7 @@ if __name__ == "__main__":
     os.mkdir(output_dir)
     os.chdir(output_dir)
     for i, e in enumerate(folds):
-        print(f"Saving fold {i}")
+        print("Saving fold {}".format(i))
         permutation = [dataList[idx] for idx in e]
-        writeFold(f'Fold_{i + 1}', permutation)
+        writeFold('Fold_{}'.format(i+1), permutation)
         os.chdir('../')
