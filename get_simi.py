@@ -21,9 +21,6 @@ def add_simi(full_data,simi_feats,simi_map):
     data_list = list() 
     uniqID=full_data['qid'].unique()
     for ID in uniqID:
-        if ID == 11110.0:
-          pdb.set_trace()
-        print("Processing query: {} ".format(ID))
         #get the datasets with the same query id 
         data_subset=full_data.loc[full_data['qid']==ID].reset_index()
         simi_map_subset=simi_map.loc[simi_map['qid']==ID].reset_index()

@@ -83,7 +83,7 @@ def build_output_stirng(data_row):
                 'lmir.jmofanchor', 'lmir.jmoftitle', 'lmir.jmofurl',
                 'lmir.jmofwholedocument', 'pagerank', 'inlinknumber', 'outlinknumber',
                 'numberofslashinurl', 'lengthofurl', 'numberofchildpage',
-                'multtfbodydlbody', 'linkinter', 'combi', 'powPageRank', 'meanTF', 'meanIDF', 'meanDL']
+                'multtfbodydlbody', 'linkinter', 'combi', 'powPageRank', 'meanTF', 'meanIDF', 'meanDL','simi']
     for i, name in enumerate(features):
         output += " {}:{}".format(i+1,data_row[name])
     output += " #dodcid = {} inc = {} prob = {}".format(data_row['did'],int(data_row['inc']),data_row['prob'])
