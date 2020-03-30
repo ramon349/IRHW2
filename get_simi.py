@@ -1,7 +1,7 @@
 import os 
 import pandas as pd 
 import sys 
-
+import pdb 
 def load_similarity_features():
     data_feats= pd.read_csv('./simi_feats.txt',names=['qid','qdid','meanCol'],sep=" ")
     data_map = pd.read_csv('./simi_list.txt',names=['qid','did'],sep="\t")
@@ -21,6 +21,9 @@ def add_simi(full_data,simi_feats,simi_map):
     data_list = list() 
     uniqID=full_data['qid'].unique()
     for ID in uniqID:
+        if ID == 11110.0:
+          pdb.set_trace()
+        print("Processing query: {} ".format(ID))
         #get the datasets with the same query id 
         data_subset=full_data.loc[full_data['qid']==ID].reset_index()
         simi_map_subset=simi_map.loc[simi_map['qid']==ID].reset_index()
@@ -35,13 +38,19 @@ def add_simi(full_data,simi_feats,simi_map):
     return full_data
 def consume_data(simiFile):
     with open(simiFile,'r') as f:
+        counter =0 
         for e in f:
             yield parse_row(e)
+            counter+=1
+        print("reads we performed {}".format(counter))
 def write_data(outputFile,data_list):
-    with open(outputFile, 'w') as f: 
+    with open(outputFile, 'w') as f:
+        counter =0 
         for e in data_list:
             f.write("{} {} {}".format(e[0],e[1],e[2]))
             f.write('\n')
+            counter+=1
+        print("writes we performed {}".format(counter))
 if __name__ == "__main__":
     data_list = list() 
     simiFile = sys.argv[1]
