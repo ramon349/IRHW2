@@ -33,14 +33,18 @@ def add_simi(full_data,simi_feats,simi_map):
     myStuff = pd.DataFrame.from_dict({'simi':data_list})
     full_data = pd.concat((full_data,myStuff),axis=1)
     return full_data
-if __name__ == "__main__":
-    data_list = list() 
-    simiFile = sys.argv[1]
-    outputFile = sys.argv[2]
+def consume_data(simiFile):
     with open(simiFile,'r') as f:
-        for i,e in enumerate(f):
-            data_list.append(parse_row(e))
+        for e in f:
+            yield parse_row(e)
+def write_data(outputFile,data_list):
     with open(outputFile, 'w') as f: 
         for e in data_list:
             f.write("{} {} {}".format(e[0],e[1],e[2]))
             f.write('\n')
+if __name__ == "__main__":
+    data_list = list() 
+    simiFile = sys.argv[1]
+    outputFile = sys.argv[2]
+    data = consume_data(simiFile)
+    write_data(outputFile,data)
