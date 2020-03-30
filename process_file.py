@@ -83,8 +83,7 @@ def build_output_stirng(data_row):
                 'lmir.jmofanchor', 'lmir.jmoftitle', 'lmir.jmofurl',
                 'lmir.jmofwholedocument', 'pagerank', 'inlinknumber', 'outlinknumber',
                 'numberofslashinurl', 'lengthofurl', 'numberofchildpage',
-                'multtfbodydlbody', 'linkinter', 'combi', 'powPageRank', 'meanTF', 'meanIDF', 'meanDL']
-    others = ['docid', 'inc', 'prop']
+                'multtfbodydlbody', 'linkinter', 'combi', 'powPageRank', 'meanTF', 'meanIDF', 'meanDL','simi']
     for i, name in enumerate(features):
         output += f" {i + 1}:{data_row[name]}"
     output += f" #dodcid = {data_row['did']} inc = {int(data_row['inc'])} prob = {data_row['prob']}"
@@ -111,7 +110,7 @@ def expand_data(filePath, idmap,simi_feats=None,simi_map=None):
     # indexFrame = pd.DataFrame.from_dict({'id': newID})
     # data = pd.concat((data, indexFrame), axis=1)
     # data.set_index('id')
-    #data = add_simi(data,simi_feats,simi_map)#add similarity features 
+    data = add_simi(data,simi_feats,simi_map)#add similarity features 
     data['multtfbodydlbody'] = data['tfbody'] * data['dlbody']
     data['linkinter'] = data['inlinknumber'] * data['outlinknumber']
     data['combi'] = data['tfdocument'] * data['idfdocument']
@@ -146,8 +145,8 @@ if __name__ == "__main__":
     os.chdir(data_dir)
     dataFiles = sorted(glob('S*'))  # here we get the files meant to be for training testing
     dataList = list()
-    #(simi_feats,simi_map)= load_similarity_features()
-    (simi_feats,simi_map) = (None, None)
+    (simi_feats,simi_map)= load_similarity_features()
+    #(simi_feats,simi_map) = (None, None)
     for e in dataFiles:
         print(f"Loading and expanding {e}")
         data = expand_data(e, idmap,simi_feats,simi_map)
