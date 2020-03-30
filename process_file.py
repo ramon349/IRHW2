@@ -36,7 +36,7 @@ def load_data(dataPath):
     """
     featNames = getFeatureNames()
     # This range corresponds with the useful features
-    data: pd.DataFrame = pd.read_csv(dataPath, names=featNames, sep=" ", usecols=range(0, 48))
+    data = pd.read_csv(dataPath, names=featNames, sep=" ", usecols=range(0, 48))
     # this range corresponds with the ID column
     docIDS = pd.read_csv(dataPath, names=['did'], sep=" ", usecols=range(50, 51))
     inc = pd.read_csv(dataPath, names=['inc'], sep=" ", usecols=range(53, 54)) 
@@ -83,10 +83,10 @@ def build_output_stirng(data_row):
                 'lmir.jmofanchor', 'lmir.jmoftitle', 'lmir.jmofurl',
                 'lmir.jmofwholedocument', 'pagerank', 'inlinknumber', 'outlinknumber',
                 'numberofslashinurl', 'lengthofurl', 'numberofchildpage',
-                'multtfbodydlbody', 'linkinter', 'combi', 'powPageRank', 'meanTF', 'meanIDF', 'meanDL','simi']
+                'multtfbodydlbody', 'linkinter', 'combi', 'powPageRank', 'meanTF', 'meanIDF', 'meanDL']
     for i, name in enumerate(features):
         output += " {}:{}".format(i+1,data_row[name])
-    output += f" #dodcid = {} inc = {} prob = {}".format(data_row['did'],int(data_row['inc']),data_row['prob'])
+    output += " #dodcid = {} inc = {} prob = {}".format(data_row['did'],int(data_row['inc']),data_row['prob'])
 
     return output
 
@@ -110,7 +110,7 @@ def expand_data(filePath, idmap,simi_feats=None,simi_map=None):
     # indexFrame = pd.DataFrame.from_dict({'id': newID})
     # data = pd.concat((data, indexFrame), axis=1)
     # data.set_index('id')
-    data = add_simi(data,simi_feats,simi_map)#add similarity features 
+    #data = add_simi(data,simi_feats,simi_map)#add similarity features 
     data['multtfbodydlbody'] = data['tfbody'] * data['dlbody']
     data['linkinter'] = data['inlinknumber'] * data['outlinknumber']
     data['combi'] = data['tfdocument'] * data['idfdocument']
@@ -140,14 +140,15 @@ if __name__ == "__main__":
     data_dir = sys.argv[1] #'./MQ2008/'  # this is the data directory
     # directory where data will be saved
     output_dir = sys.argv[2]#"./2008_augData1/"
-    print("Will extract features for {} and save to {}".format(data_dir,output_dir)
+    print("Will extract features for {} and save to {}".format(data_dir,output_dir))
     main_path = os.getcwd()
     os.chdir(data_dir)
     dataFiles = sorted(glob('S*'))  # here we get the files meant to be for training testing
     dataList = list()
-    (simi_feats,simi_map)= load_similarity_features()
+#    (simi_feats,simi_map)= load_similarity_features()
+    simi_feats,simi_map = None,None 
     for e in dataFiles:
-        print("Loading and expanding {}".format(e)
+        print("Loading and expanding {}".format(e))
         data = expand_data(e, idmap,simi_feats,simi_map)
         dataList.append(data)
         print("Done expanding {}".format(e))

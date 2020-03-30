@@ -3,7 +3,7 @@ import pandas as pd
 import sys 
 
 def load_similarity_features():
-    data_feats= pd.read_csv('./simi_features.txt',names=['qid','qdid','meanCol'],sep=" ")
+    data_feats= pd.read_csv('./simi_feats.txt',names=['qid','qdid','meanCol'],sep=" ")
     data_map = pd.read_csv('./simi_list.txt',names=['qid','did'],sep="\t")
     return (data_feats,data_map)
 
@@ -17,14 +17,23 @@ def parse_row(data_row):
     qdid = measurements[1].split(':')[-1]
     return (queryid,qdid,data_sum)
 
-def add_simi(full_data:pd.DataFrame,simi_feats,simi_map):
+def add_simi(full_data,simi_feats,simi_map):
     data_list = list() 
     for i,e in full_data.iterrows():
         sample_qid  = int(e['qid'])
         sample_did = e['did']
-        matches= simi_map.loc[simi_map['did']==sample_did] #find document match
-        idx= matches.loc[matches['qid'] ==sample_qid].index[0]
-        feat=simi_feats.iloc[idx]['meanCol']
+        #here we identify the query's  that exist and get a number of them
+        query_matches = simi_map.loc[simi_map['qid']==sample_qid].reset_index()
+        #from all the documetns belong to that query i now search for the matching 
+        #document 
+        idx = query_matches.loc[query_matches['did']==sample_did].index[0]
+        #in the order of the queries with matchin qid this document is the idx element
+        try:  
+	    #i suspect the similarity features are incomplete... the ranking of documents
+            #is incomplete. for some quuerys simi_feats only has 170 qid instead of a 1000
+            feat=simi_feats.iloc[idx]['meanCol']
+        except IndexError: 
+            feat =0.0
         data_list.append(feat)
     myStuff = pd.DataFrame.from_dict({'simi':data_list})
     full_data = pd.concat((full_data,myStuff),axis=1)
