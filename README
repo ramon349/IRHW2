@@ -22,3 +22,5 @@ Order of execution
 4. run bash ./processing_scripts/test_model.sh  run ranklib comparison 
 5. run bash ./processing_scripts/process.sh  pre process score output of ranklib so perl script will process 
 6. run bash ./processing_scripts/eval.sh   This generates perl evaluation  
+7. run  bash ./outputs.sh to get the tables 
+8. run bash ./build_outputlog.sh to get the submited output file 
