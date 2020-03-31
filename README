@@ -1,26 +1,24 @@
 project layout 
 /HW2/MQ2007 
-  - should contain all unzipped files. Should add featureNames.txt 
+  - should contain all unzipped files.
 /HW2/MQ2008 
     - same as above 
 /HW2 
-  - Has thee MQ oflders 
-  - all the .py and sh files  
+  - Has thee MQ folders 
+  - all the .py files 
   - the RankLib.jar 
   - Eval-Score-4.0 pl 
+/HW2/utils 
+  - should contain 2008 and 2007 similarity files. Named 2007_large_simi.txt and such 
+  - should incldue featureNames.txt 
   - should also have RefTable.txt and sitemap.txt 
+/HW2/processing_scripts/
+ - contains al necessary processing bash scripts 
 
-
-todo for similarity features: 
-1. Download the MQ2008-semi and MQ2007-semi data
-2. Extract only the Large_NULL.TXT files.
-  2.a in hw folder make a folder called utils 
-  2.a rename the large_null files to MQ2008_large_null.txt and MQ2007_large_null.txt and put then in utils
-3. download the 2007 and 2008 simi files. alos move them to the utils folder 
-  3.a name the files 2007_large_simi respectively 
-3. run bash ./processing_scripts/getQuery2Doc.sh 
-  3a. This generates  MQ2008_list and MQ2007_list.txt  which is the rankigns of documents and query pairs 
-  3b. This is needed by get_simi.py to calculate the actual features 
-  3c. This script will also extract the necessary similarity features by calling get_simi.py 
-4. run bash ./processing_scripts/generate_dataset.sh 
- 4.a this will generate the augmented datasets now called 2007_augData and 2008_augData
+Order of execution 
+1. run  bash ./processing_scripts/getQuery2Doc.sh 
+2. run bash ./processing_scripts/generate_dataset.sh 
+3. run bsh ./processing_scripts/train_model.sh  train models 
+4. run bash ./processing_scripts/test_model.sh  run ranklib comparison 
+5. run bash ./processing_scripts/process.sh  pre process score output of ranklib so perl script will process 
+6. run bash ./processing_scripts/eval.sh   This generates perl evaluation  
